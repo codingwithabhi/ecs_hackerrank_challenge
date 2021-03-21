@@ -75,6 +75,18 @@ def get_courses():
 @app.route("/course", methods=['POST'])
 def create_course():
 
+    with open('json/course.json','r') as f:
+        data = json.load(f)
+        data.append(dict(request.args))
+    with open('json/course.json','w') as f:
+        json.dump(data,f)
+    
+    status = 201
+    message = dict(request.args)
+
+    response = Response(json.dumps(message), status, mimetype='application/json')
+    return response
+
 
     """Create a course.
     :return: The course object (see the challenge notes for examples)
@@ -92,6 +104,24 @@ def create_course():
 
 @app.route("/course/<int:id>", methods=['PUT'])
 def update_course(id):
+    with open('json/course.json','r') as f:
+        data = json.load(f)
+        message = {"message":"course " +str(id)+ " does not match the payload"}
+        status = 404
+        for course in data:
+            if course["id"]==id:
+                for key in dict(request.args):
+                    course[key] = dict(request.args)[key]
+                message = course
+                status=200
+    with open('json/course.json','w') as f:
+        json.dump(data,f)
+
+
+    response = Response(json.dumps(message), status, mimetype='application/json')
+    return response
+
+
     """Update a a course.
     :param int id: The record id.
     :return: The updated course object (see the challenge notes for examples)
@@ -117,8 +147,12 @@ def delete_course(id):
         status = 404
         for course in data:
             if course["id"]==id:
-                message = course
+                data.remove(course)
+                message = {"message":"The Specified course was deleted"}
                 status=200
+
+    with open('json/course.json','w') as f:
+        json.dump(data,f)
 
 
     response = Response(json.dumps(message), status, mimetype='application/json')
