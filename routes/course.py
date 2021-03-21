@@ -44,8 +44,8 @@ def get_course(id):
 def get_courses():
     with open('json/course.json','r') as f:
         titleWords = request.args.get('title-words')
-        pageNumber = int(request.args.get('page-number')) if request.args.get('page-number') else None
-        pageSize = int(request.args.get('page-size')) if request.args.get('page-size') else None 
+        pageNumber = int(request.args.get('page-number')) if request.args.get('page-number') else 1
+        pageSize = int(request.args.get('page-size')) if request.args.get('page-size') else 1
         filteredData = []
         data = json.load(f)
         if titleWords:
