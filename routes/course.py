@@ -43,7 +43,29 @@ def get_course(id):
 @app.route("/course", methods=['GET'])
 def get_courses():
     with open('json/course.json','r') as f:
+        titleWords = request.args.get('title-words')
+        pageNumber = int(request.args.get('page-number')) if request.args.get('page-number') else None
+        pageSize = int(request.args.get('page-size')) if request.args.get('page-size') else None 
+        filteredData = []
         data = json.load(f)
+        if titleWords:
+            newData = []
+            for word in titleWords.split(','):
+                for item in data:
+                    if word in item['title'].lower():
+                        if item not in newData:
+                            newData.append(item) 
+            data = newData
+        if pageNumber and pageSize and data:
+            for course in range(pageSize*(pageNumber-1), pageNumber*pageSize):
+                filteredData.append(data[course])
+            if(titleWords):
+                for filteredCourse in filteredData:
+                    print(filteredCourse['title'])
+                    if(titleWords not in filteredCourse['title']):
+                        filteredData.remove(filteredCourse)
+
+            return jsonify(filteredData)
 
     return jsonify(data)
 
